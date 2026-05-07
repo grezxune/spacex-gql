@@ -1,14 +1,10 @@
 import { type AppContext } from '../../context.js';
-import { type LaunchLookupResult, type LaunchModel, type LaunchOutcome } from './launch.types.js';
+import { type LaunchLookupResult, type LaunchModel } from './launch.types.js';
 
 interface LaunchQueryArgs {
   id: string;
 }
 
-interface LaunchCollectionQueryArgs {
-  outcome: LaunchOutcome;
-  limit?: number | null;
-}
 
 const normalizeLaunchId = (id: string): string => id.trim().toLowerCase();
 
@@ -24,9 +20,7 @@ export const launchResolvers = {
           launch: null,
           error: {
             code: 'INVALID_INPUT',
-            message: 'TODO: return a clearer invalid-input message',
-          },
-        };
+            message: 'TODO: return a clearer invalid-input message' } };
       }
 
       // TODO:
@@ -36,16 +30,6 @@ export const launchResolvers = {
       // - return the mapped launch on success
       throw new Error('TODO: implement Query.launch');
     },
-
-    launchesByOutcome: async (_parent: unknown, _arguments: LaunchCollectionQueryArgs, _context: AppContext): Promise<LaunchModel[]> => {
-      // TODO:
-      // - fetch launches for the requested outcome
-      // - map each DTO into the GraphQL model
-      // - sort by name
-      // - apply limit after sorting
-      // - treat negative limits as 0
-      throw new Error('TODO: implement Query.launchesByOutcome');
-    },
   },
 
   Launch: {
@@ -54,6 +38,4 @@ export const launchResolvers = {
       // - derive a readable summary from the mapped LaunchModel
       // - include name, id, outcome, metric, and detail/fallback
       throw new Error('TODO: implement Launch.summary');
-    },
-  },
-};
+    } } };

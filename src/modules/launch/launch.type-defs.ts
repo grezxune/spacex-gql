@@ -1,10 +1,4 @@
 export const launchTypeDefs = /* GraphQL */ `
-  enum LaunchOutcome {
-    FAILURE
-    SUCCESS
-    UPCOMING
-  }
-
   enum LaunchLookupErrorCode {
     INVALID_INPUT
     NOT_FOUND
@@ -31,6 +25,5 @@ export const launchTypeDefs = /* GraphQL */ `
 
   extend type Query {
     launch(id: ID!): LaunchLookupResult!
-    launchesByOutcome(outcome: LaunchOutcome!, limit: Int = 5): [Launch!]!
   }
 `;

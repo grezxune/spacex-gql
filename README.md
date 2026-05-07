@@ -17,7 +17,6 @@ https://api.spacexdata.com/v4
 The schema exposes:
 
 - `launch(id: ID!): LaunchLookupResult!`
-- `launchesByOutcome(outcome: LaunchOutcome!, limit: Int = 5): [Launch!]!`
 
 The public `Launch` type stays intentionally small: `id`, `name`, `detail`, `tags`, and `summary`.
 
@@ -34,8 +33,6 @@ Functional requirements:
 - validate and normalize `id` for `launch`
 - return `INVALID_INPUT`, `NOT_FOUND`, and `UPSTREAM_ERROR` in the lookup result when appropriate
 - map REST DTOs into the GraphQL model with null/default/sorted-array handling
-- sort `launchesByOutcome` results by `name`, then apply `limit`
-- treat negative limits as `0`
 - compute a deterministic `Launch.summary`
 
 ## How To Run

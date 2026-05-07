@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { type AppContext } from '../src/context.js';
 import { type RestLaunchRecord, UpstreamServiceError } from '../src/datasources/spacex-api.js';
-import { type LaunchOutcome } from '../src/modules/launch/launch.types.js';
 import { createServer } from '../src/server.js';
 
 const lookupQuery = /* GraphQL */ `
@@ -22,33 +21,21 @@ const lookupQuery = /* GraphQL */ `
   }
 `;
 
-const collectionQuery = /* GraphQL */ `
-  query Collection($outcome: LaunchOutcome!, $limit: Int) {
-    launchesByOutcome(outcome: $outcome, limit: $limit) {
-      id
-      name
-    }
-  }
-`;
 
 const primary: RestLaunchRecord = { id: '5eb87cd9ffd86e000604b32a', name: 'FalconSat', details: 'Engine failure at 33 seconds.', outcomeName: 'failure', flightNumber: 1, payloadTags: ['payload-z', 'payload-a', 'failure'] };
-const second: RestLaunchRecord = { id: '5eb87cdfffd86e000604b331', name: 'CRS-1', details: 'Dragon mission.', outcomeName: 'success', flightNumber: 9, payloadTags: ['dragon'] };
-const third: RestLaunchRecord = { id: '5ed9819a1f30554030d45c29', name: 'ANASIS-II', details: 'Satellite launch.', outcomeName: 'success', flightNumber: 90, payloadTags: ['satellite'] };
 
 const createMockContext = () => {
   const getLaunchById = vi.fn(async (_id: string) => null as RestLaunchRecord | null);
-  const getLaunchesByOutcome = vi.fn(async (_outcome: LaunchOutcome) => [] as RestLaunchRecord[]);
 
   const context: AppContext = {
     dataSources: {
       spaceXApi: {
         getLaunchById,
-        getLaunchesByOutcome,
       },
     },
   };
 
-  return { context, getLaunchById, getLaunchesByOutcome };
+  return { context, getLaunchById };
 };
 
 const executeSingle = async (query: string, variables: Record<string, unknown>, contextValue: AppContext) => {
@@ -141,39 +128,6 @@ describe('launch queries', () => {
           message: 'SpaceX is currently unavailable.',
         },
       },
-    });
-  });
-
-  it('sorts launches by name before applying the limit', async () => {
-    const { context, getLaunchesByOutcome } = createMockContext();
-    getLaunchesByOutcome.mockResolvedValue([second, primary, third]);
-
-    const result = await executeSingle(collectionQuery, { outcome: 'SUCCESS', limit: 2 }, context);
-
-    expect(result.errors).toBeUndefined();
-    expect(result.data).toEqual({
-      launchesByOutcome: [
-        {
-          id: '5ed9819a1f30554030d45c29',
-          name: 'ANASIS-II',
-        },
-        {
-          id: '5eb87cdfffd86e000604b331',
-          name: 'CRS-1',
-        },
-      ],
-    });
-  });
-
-  it('treats a negative limit as zero', async () => {
-    const { context, getLaunchesByOutcome } = createMockContext();
-    getLaunchesByOutcome.mockResolvedValue([second, primary, third]);
-
-    const result = await executeSingle(collectionQuery, { outcome: 'SUCCESS', limit: -3 }, context);
-
-    expect(result.errors).toBeUndefined();
-    expect(result.data).toEqual({
-      launchesByOutcome: [],
     });
   });
 });
